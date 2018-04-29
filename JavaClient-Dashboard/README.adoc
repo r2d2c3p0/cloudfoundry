@@ -1,0 +1,8 @@
+Cloud Foundry https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html[defines a number of environment variables], but at the moment, only parsing https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#VCAP-SERVICES[`VCAP_SERVICES`]. List the bound services by name, exposing the metadata and credentials for each, and provide convenient access to any SSL keys and certificates encoded in the credentials.
+
+--------------------------------------------------
+Future enhancements to print the applications and the memory usage to track the quotas on a daily basis.
+--------------------------------------------------
+
+Build it with Gradle:
+./gradlew build
