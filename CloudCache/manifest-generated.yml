@@ -1,0 +1,9 @@
+applications:
+- name: r2pcc
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  disk_quota: 1G
+  instances: 1
+  memory: 1G
+  routes:
+  - route: r2pcc.cfapps.io
+  stack: cflinuxfs2
