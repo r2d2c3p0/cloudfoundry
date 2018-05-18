@@ -10,7 +10,6 @@
 # dob           : 5/18/2018
 # tool name     : foundationMetrics.py
 #
-#[sr87813@NACGTDPCFJ02U ~]$ python g.py > g.out
 #
 
 # imports.
