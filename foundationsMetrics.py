@@ -2,7 +2,7 @@
 #
 #
 # version       : 1.0.1 (initial version ${1.0.0})
-# description   : python v2 or more and cloud foundry Paas.
+# description   : python v2 or more and cloud foundry PaaS.
 # modifications : 1.0.0 (5/18/2018) initial version.
 #		  1.0.1 (5/29/2018), exit program if API login fails.
 #
@@ -12,13 +12,13 @@
 #
 #
 
-# imports.
+# global imports.
 from __future__ import division
 from multiprocessing import Process, current_process
 from time import strftime
 import os, re, sys, os.path, json
 
-# Global Variables
+# global variables
 foundationDiskAllocated=0
 foundationDiskUsage=0
 foundationMemoryAllocated=0
@@ -53,55 +53,50 @@ if __name__ == "__main__":
 			microservices = os.popen("cf apps | awk '{print $1}' | egrep -v 'name|OK|Getting|^$'").read()
 			for microservice in microservices.splitlines():
 				if not re.match(r'^\s*$', microservice):
-					try:
-						guidCommand="cf curl /v2/apps/$(cf app %s --guid)" %(microservice)
-						guidData = os.popen(guidCommand).read()
-						guidObject = json.loads(guidData)
-						appName=guidObject["entity"]["name"]
-						state=guidObject["entity"]["state"]
-						memoryAllocated=guidObject["entity"]["memory"]
-						diskAllocated=guidObject["entity"]["disk_quota"]
-						instances=guidObject["entity"]["instances"]
-						print "\tApplication: %s" %(appName)
-						print "\t\tstate: %s" %(state)
-						print "\t\tinstances: %s" %(instances)
-						print "\t\tmemory[alloc]: %s MB per instance" %(memoryAllocated)
-						print "\t\tdisk[alloc]: %s MB per instance" %(diskAllocated)
-						spaceMemoryAllocated=spaceMemoryAllocated+(memoryAllocated*instances)
-						spaceDiskAllocated=spaceDiskAllocated+(diskAllocated*instances)
-						if state == "STARTED":
-							statsCommand="cf curl /v2/apps/$(cf app %s --guid)/stats" %(microservice)
-							appData = os.popen(statsCommand).read()
-							applicationObject = json.loads(appData)
-							current_memory_usage=0
-							current_disk_usage=0
-							for i in range(0, 100):
-									try:
-										instance_mem_usage=applicationObject[str(i)]["stats"]["usage"]["mem"]
-										instance_disk_usage=applicationObject[str(i)]["stats"]["usage"]["disk"]
-										current_memory_usage=current_memory_usage+instance_mem_usage
-										current_disk_usage=current_disk_usage+instance_disk_usage
-										print "\t\tinstance "+str(i)+" usage:\n\t\t\tmemory: "+str((instance_mem_usage/1024)/1024)+" MB\n\t\t\tdisk: "+str((instance_disk_usage/1024)/1024)+ " MB"
-									except:
-										break
-									#endTryExcept
-							#endFor
-							print "\t\ttotal application usage:\n\t\t\tmemory: "+str(((current_memory_usage/1024)/1024))+" MB\n\t\t\tdisk: "+str(((current_disk_usage/1024)/1024))+" MB"
-						#endIf
-					except:
-						#print "\tApplication: %s is not valid." %(microservice)
-						print "\t No applications are defined for this space (%s)." %(space)
+					if not re.match("\\bNo\\b", microservice):
+						try:
+							guidCommand="cf curl /v2/apps/$(cf app %s --guid)" %(microservice)
+							guidData = os.popen(guidCommand).read();guidObject = json.loads(guidData)
+							appName=guidObject["entity"]["name"];state=guidObject["entity"]["state"]
+							memoryAllocated=guidObject["entity"]["memory"];diskAllocated=guidObject["entity"]["disk_quota"]
+							instances=guidObject["entity"]["instances"]
+							print "\tApplication: %s" %(appName);print "\t\tstate: %s" %(state)
+							print "\t\tinstances: %s" %(instances);print "\t\tmemory[alloc]: %s MB per instance" %(memoryAllocated)
+							print "\t\tdisk[alloc]: %s MB per instance" %(diskAllocated)
+							spaceMemoryAllocated=spaceMemoryAllocated+(memoryAllocated*instances)
+							spaceDiskAllocated=spaceDiskAllocated+(diskAllocated*instances)
+							if state == "STARTED":
+								statsCommand="cf curl /v2/apps/$(cf app %s --guid)/stats" %(microservice)
+								appData = os.popen(statsCommand).read()
+								applicationObject = json.loads(appData);current_memory_usage=0;current_disk_usage=0
+								for i in range(0, 100):
+										try:
+											instance_mem_usage=applicationObject[str(i)]["stats"]["usage"]["mem"]
+											instance_disk_usage=applicationObject[str(i)]["stats"]["usage"]["disk"]
+											current_memory_usage=current_memory_usage+instance_mem_usage;current_disk_usage=current_disk_usage+instance_disk_usage
+											print "\t\tinstance "+str(i)+" usage:\n\t\t\tmemory: "+str((instance_mem_usage/1024)/1024)+" MB\n\t\t\tdisk: "+str((instance_disk_usage/1024)/1024)+ " MB"
+										except:
+											break
+										#endTryExcept
+								#endFor
+								print "\t\ttotal application usage:\n\t\t\tmemory: "+str(((current_memory_usage/1024)/1024))+" MB\n\t\t\tdisk: "+str(((current_disk_usage/1024)/1024))+" MB"
+							#endIf
+						except:
+							#print "\tApplication: %s is not valid." %(microservice)
+							print "\t No applications are defined for this space (%s)." %(space)
+						#endTryExcept
+					else:
+							print "\t No applications are defined for this space (%s)." %(space)
+					#endIfElse
 				#endIf
 			#endFor
 			print "\tTotal Space (%s) disk allocated: %s GB" %(space, (spaceDiskAllocated/1024))
 			print "\tTotal Space (%s) memory allocated: %s GB" %(space, (spaceMemoryAllocated/1024))
-			orgDiskAllocated=orgDiskAllocated+spaceDiskAllocated
-			orgMemoryAllocated=orgMemoryAllocated+spaceMemoryAllocated
+			orgDiskAllocated=orgDiskAllocated+spaceDiskAllocated;orgMemoryAllocated=orgMemoryAllocated+spaceMemoryAllocated
 		#endFor
 		print "\tTotal Org (%s) disk allocated: %s GB" %(organization, (orgDiskAllocated/1024))
 		print "\tTotal Org (%s) memory allocated: %s GB" %(organization, (orgMemoryAllocated/1024))
-		foundationDiskAllocated=foundationDiskAllocated+orgDiskAllocated
-		foundationMemoryAllocated=foundationMemoryAllocated+orgMemoryAllocated
+		foundationDiskAllocated=foundationDiskAllocated+orgDiskAllocated;foundationMemoryAllocated=foundationMemoryAllocated+orgMemoryAllocated
 	#endFor
 	print "\tTotal Foundation disk allocated: %s GB" %(foundationDiskAllocated/1024)
 	print "\tTotal Foundation memory allocated: %s GB" %(foundationMemoryAllocated/1024)
@@ -109,7 +104,7 @@ if __name__ == "__main__":
 	print
 else:
 	print "\tERROR| import failed."
-	exit()
+	sys.exit(0)
 #endIfElse
 
 #foundationMetrics.py
