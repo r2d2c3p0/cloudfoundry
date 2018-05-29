@@ -1,11 +1,10 @@
 # python - v2 or more
 #
 #
-# version       : 1.0.0 (initial version ${1.0.0})
-# description   : .
-# modifications : 1.0.1 ${version}.
-#				  1.0.0 (5/18/2018) initial version.
-#				  1.0.1 (5/29/2018), exit program if API login fails.
+# version       : 1.0.1 (initial version ${1.0.0})
+# description   : python v2 or more and cloud foundry Paas.
+# modifications : 1.0.0 (5/18/2018) initial version.
+#		  1.0.1 (5/29/2018), exit program if API login fails.
 #
 # author        : r2d2c3p0.
 # dob           : 5/18/2018
