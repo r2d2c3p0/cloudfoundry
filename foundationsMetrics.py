@@ -1,12 +1,13 @@
-# python - v2 or less
+# python - v2 or more
 #
 #
 # version       : 1.0.0 (initial version ${1.0.0})
 # description   : .
-# modifications : 1.0.0 (5/18/2018) inital version.
+# modifications : 1.0.1 ${version}.
+#				  1.0.0 (5/18/2018) initial version.
+#				  1.0.1 (5/29/2018), exit program if API login fails.
 #
-#
-# author        : Shane Reddy.
+# author        : r2d2c3p0.
 # dob           : 5/18/2018
 # tool name     : foundationMetrics.py
 #
@@ -29,6 +30,12 @@ if __name__ == "__main__":
 	""" Cannot invoke import."""
 	print
 	organizations = os.popen("cf orgs | awk '{print $1}' | egrep -v 'name|OK|Getting|^$'").read()
+	if organizations.find("FAILED") == -1:
+		pass
+	else:
+		print "ERROR| No active session found, please login ...";print
+		sys.exit(1)
+	#endIfElse
 	for organization in organizations.splitlines():
 		orgDiskAllocated=0
 		orgDiskUsage=0
